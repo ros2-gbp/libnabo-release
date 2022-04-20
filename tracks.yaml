@@ -73,7 +73,7 @@ tracks:
     last_version: 1.0.7
     name: upstream
     patches: null
-    release_inc: '2'
+    release_inc: '3'
     release_repo_url: null
     release_tag: master
     release_tag_saved: :{ask}
