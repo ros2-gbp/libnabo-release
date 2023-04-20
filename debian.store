@@ -1,1 +1,1 @@
-{"base": "1d1c302", "parent": "debian/rolling/libnabo", "previous": "5a27088", "trim": "", "trimbase": ""}
+{"base": "005e073", "parent": "debian/iron/libnabo", "previous": "7246b82", "trim": "", "trimbase": ""}
