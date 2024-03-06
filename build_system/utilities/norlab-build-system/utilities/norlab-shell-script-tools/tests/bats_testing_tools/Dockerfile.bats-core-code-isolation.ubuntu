@@ -1,0 +1,75 @@
+# Note:
+#   Image purpose › source code isolation for CI build
+#   This container use a copy project source code strategy instead of using the mounting volume
+
+FROM bats/bats:latest as bats-core-base-img
+
+FROM ubuntu:latest as final
+
+ARG CONTAINER_PROJECT_ROOT_NAME
+ENV CONTAINER_PROJECT_ROOT_NAME=${CONTAINER_PROJECT_ROOT_NAME:?'Build argument needs to be set and non-empty.'}
+ENV SRC_CODE_PATH="/code/${CONTAINER_PROJECT_ROOT_NAME}"
+
+ARG N2ST_BATS_TESTING_TOOLS_RELATIVE_PATH
+ENV N2ST_BATS_TESTING_TOOLS_RELATIVE_PATH=${N2ST_BATS_TESTING_TOOLS_RELATIVE_PATH:?'Build argument needs to be set and non-empty.'}
+
+LABEL org.opencontainers.image.authors="luc.coupal.1@ulaval.ca"
+
+SHELL ["/bin/bash", "-e", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+
+ENV TERM=${TERM:-"xterm-256color"}
+
+
+# ====Begin========================================================================================
+# ....Setup timezone and localization..............................................................
+# change the locale from POSIX to UTF-8
+RUN apt-get update && \
+    apt-get install --assume-yes --no-install-recommends \
+        locales && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV PYTHONIOENCODING=utf-8
+
+# ====Begin========================================================================================
+
+# ....Install development utilities................................................................
+RUN apt-get update \
+    && apt-get install --assume-yes --no-install-recommends \
+        sudo \
+        lsb-release \
+        curl \
+        wget \
+        ca-certificates \
+        git \
+        tree \
+        zip gzip tar unzip \
+        fontconfig \
+        software-properties-common \
+    && rm -rf /var/lib/apt/lists/*
+
+# ....Install bats-core............................................................................
+RUN ln -s /opt/bats/bin/bats /usr/local/bin/bats
+COPY --from=bats-core-base-img /opt/bats/ /opt/bats/
+COPY --from=bats-core-base-img /usr/lib/bats/ /usr/lib/bats/
+
+#RUN git clone https://github.com/bats-core/bats-core.git \
+#    cd bats-core \
+#    ./install.sh /usr/local
+
+RUN apt-get update \
+    && apt-get install --assume-yes --no-install-recommends \
+        tini \
+    && rm -rf /var/lib/apt/lists/*
+
+# ....Setup project source code....................................................................
+COPY . $SRC_CODE_PATH
+COPY "${N2ST_BATS_TESTING_TOOLS_RELATIVE_PATH}/bats_helper_functions.bash" $SRC_CODE_PATH/tests/bats_testing_tools/bats_helper_functions.bash
+#RUN chown -R $(whoami) $SRC_CODE_PATH
+
+# ====End==========================================================================================
+WORKDIR $SRC_CODE_PATH
+
+ENTRYPOINT [ "/usr/bin/tini", "--", "bash", "bats", "--recursive", "--verbose-run", "--print-output-on-failure" ]

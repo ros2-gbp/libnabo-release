@@ -1,0 +1,65 @@
+include:
+  - docker-compose.dependencies.yaml
+
+services:
+
+  # ====Pull-request related services==============================================================
+  ci_PR:
+    image: ${NBS_DOCKERHUB_NAMESPACE:?err}/${NBS_REPOSITORY_NAME:?err}-ci-pr:${NBS_IMAGE_TAG:?err}
+    pull_policy: build
+    build:
+      context: ..
+      # (Priority) ToDo: change path to dockerfile
+      dockerfile: ${NBS_SUPERPROJECT_BUILD_SYSTEM_DIR:?err}/nbs_container/project-core/Dockerfile.project.ci_PR
+      no_cache: true
+      args:
+        PROJECT_HUB: ${NBS_DOCKERHUB_NAMESPACE}
+        BASE_IMAGE: ${NBS_REPOSITORY_NAME}-dependencies
+        BASE_IMAGE_TAG: ${NBS_IMAGE_TAG}
+        IS_TEAMCITY_RUN: ${IS_TEAMCITY_RUN}
+        REPOSITORY_VERSION: 'latest'
+        CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE:?err}
+#        INSTALL_SCRIPT_FLAG: '--build-system-CI-install --compile-test'
+    tty: true
+    stdin_open: true
+    init: true  # Propagate exit code (See remark in task NMO-266)
+    depends_on:
+      - dependencies
+  ci_PR_amd64:
+    extends: ci_PR
+    build:
+      platforms:
+        - "linux/amd64"
+  ci_PR_arm64v8:
+    extends: ci_PR
+    build:
+      platforms:
+        - "linux/arm64"
+
+#  # ====Dockerhub release image====================================================================
+#  release:
+#    image: ${NBS_DOCKERHUB_NAMESPACE:?err}/${NBS_REPOSITORY_NAME}:${NBS_IMAGE_TAG:?err}
+#    container_name: ${NBS_REPOSITORY_NAME}
+#    build:
+#      context: ..
+#      # (Priority) ToDo: change path to dockerfile
+#      dockerfile: ${NBS_SUPERPROJECT_BUILD_SYSTEM_DIR:?err}/nbs_container/project-core/Dockerfile.project.hub_release
+#      platforms:
+#        - "linux/amd64"
+#        - "linux/arm64/v8"
+#      no_cache: true
+#      args:
+#        PROJECT_HUB: ${NBS_DOCKERHUB_NAMESPACE}
+#        BASE_IMAGE: ${NBS_REPOSITORY_NAME}-dependencies
+#        BASE_IMAGE_TAG: ${NBS_IMAGE_TAG}
+#        IS_TEAMCITY_RUN: ${IS_TEAMCITY_RUN}
+#        REPOSITORY_VERSION: ${REPOSITORY_VERSION:?err}
+#        CMAKE_BUILD_TYPE: 'Release'
+##        INSTALL_SCRIPT_FLAG: '--compile-test --generate-doc'
+#    tty: true
+#    stdin_open: true
+#    init: true  # Propagate exit code (See remark in task NMO-266)
+#    depends_on:
+#      - dependencies
+
+

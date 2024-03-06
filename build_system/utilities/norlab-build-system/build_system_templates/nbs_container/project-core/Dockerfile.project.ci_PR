@@ -1,0 +1,46 @@
+ARG PROJECT_HUB=norlabulaval
+ARG BASE_IMAGE
+ARG BASE_IMAGE_TAG
+FROM ${PROJECT_HUB}/${BASE_IMAGE:?err}:${BASE_IMAGE_TAG:?err} AS project-core
+
+LABEL org.opencontainers.image.authors="luc.coupal.1@ulaval.ca"
+
+ARG REPOSITORY_VERSION='latest'
+ENV REPOSITORY_VERSION=${REPOSITORY_VERSION}
+LABEL ${NBS_REPOSITORY_NAME}.version="${REPOSITORY_VERSION}"
+
+ARG NBS_LIB_INSTALL_PATH
+ARG NBS_REPOSITORY_NAME
+ENV NBS_LIB_INSTALL_PATH=${NBS_LIB_INSTALL_PATH:?'Build argument needs to be set and non-empty.'}
+ENV NBS_REPOSITORY_NAME=${NBS_REPOSITORY_NAME:?'Build argument needs to be set and non-empty.'}
+
+ARG CMAKE_BUILD_TYPE=RelWithDebInfo
+ARG INSTALL_SCRIPT_FLAG='--build-system-CI-install --compile-test'
+# Note: Those env variable are used in the entrypoint build version
+ENV CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+ENV INSTALL_SCRIPT_FLAG=${INSTALL_SCRIPT_FLAG}
+
+ARG IS_TEAMCITY_RUN
+ENV IS_TEAMCITY_RUN=${IS_TEAMCITY_RUN:-false}
+
+SHELL ["/bin/bash", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+
+# ToDo: validate
+ENV TERM=${TERM:-"xterm-256color"}
+
+# ====Checkout repository==========================================================================
+WORKDIR "${NBS_LIB_INSTALL_PATH}/${NBS_REPOSITORY_NAME}"
+
+# Copy all files from the checkout branch in the repository (except those in the .dockerignore)
+COPY . .
+
+# ====Check dependencies installed versions========================================================
+WORKDIR "${NBS_LIB_INSTALL_PATH}/${NBS_REPOSITORY_NAME}/${NBS_SUPERPROJECT_BUILD_SYSTEM_DIR}"
+
+RUN chmod +x ./nbs_container/project-core/entrypoint.bash
+
+
+# ====End==========================================================================================
+ENTRYPOINT [ "./nbs_container/project-core/entrypoint.bash" ]
+CMD [ "bash" ]
