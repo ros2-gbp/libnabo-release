@@ -1,3 +1,26 @@
+## libnabo (rolling) - 1.1.1-1
+
+The packages in the `libnabo` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --track rolling --rosdistro rolling libnabo` on `Fri, 22 Mar 2024 11:58:29 -0000`
+
+The `libnabo` package was released.
+
+Version of package(s) in repository `libnabo`:
+
+- upstream repository: https://github.com/norlab-ulaval/libnabo.git
+- release repository: https://github.com/ros2-gbp/libnabo-release.git
+- rosdistro version: `1.0.7-4`
+- old version: `1.0.7-4`
+- new version: `1.1.1-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `1.0.0`
+- rosdep version: `0.22.2`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## libnabo (melodic) - 1.0.7-1
 
 The packages in the `libnabo` repository were released into the `melodic` distro by running `/usr/bin/bloom-release libnabo --rosdistro melodic --new-track` on `Tue, 04 Jan 2022 07:11:27 -0000`
