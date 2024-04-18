@@ -13,6 +13,9 @@ ENV SRC_CODE_PATH="/code/${CONTAINER_PROJECT_ROOT_NAME}"
 ARG N2ST_BATS_TESTING_TOOLS_RELATIVE_PATH
 ENV N2ST_BATS_TESTING_TOOLS_RELATIVE_PATH=${N2ST_BATS_TESTING_TOOLS_RELATIVE_PATH:?'Build argument needs to be set and non-empty.'}
 
+ARG TEAMCITY_VERSION
+ENV TEAMCITY_VERSION=${TEAMCITY_VERSION}
+
 LABEL org.opencontainers.image.authors="luc.coupal.1@ulaval.ca"
 
 SHELL ["/bin/bash", "-e", "-c"]
