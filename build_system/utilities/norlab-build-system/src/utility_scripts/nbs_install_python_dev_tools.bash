@@ -16,8 +16,8 @@ if [[ "$(basename "$(pwd)")" != "utility_scripts" ]]; then
 fi
 
 # ....path resolution logic........................................................................
-_PATH_TO_SCRIPT="$(realpath "$0")"
-NBS_PATH="$(dirname "${_PATH_TO_SCRIPT}")/../.."
+SCRIPT_PATH="$(realpath "$0")"
+NBS_PATH="$( realpath "$(dirname "${SCRIPT_PATH}")/../.." )"
 
 # ....Helper function..............................................................................
 # import shell functions from utilities library

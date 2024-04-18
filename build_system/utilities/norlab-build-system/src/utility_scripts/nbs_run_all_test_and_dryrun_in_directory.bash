@@ -11,9 +11,8 @@
 #   source "${NBS_UTIL_SCRIPT}/nbs_run_all_test_and_dryrun_in_directory.bash" "$SCRIPT_DIR_PATH"
 #
 
-set -e            # exit on error
-set -o nounset    # exit on unbound variable
-set -o pipefail   # exit if errors within pipes
+
+
 
 SCRIPT_DIR_PATH="${1:?'[ERROR] Missing mandatory path to directory to run script'}"
 
@@ -22,10 +21,14 @@ MSG_ERROR_FORMAT="\033[1;31m"
 MSG_END_FORMAT="\033[0m"
 
 function nbs::run_all_script_in_directory(){
+  set +e            # Propagate exit code ‹ Dont exit on error
+  set +o pipefail   # Propagate exit code ‹ Dont exit if errors within pipes
+
   local _TMP_CWD
   _TMP_CWD=$(pwd)
   cd "${SCRIPT_DIR_PATH}" || exit 1
 
+  local OVERALL_EXIT_CODE=0
   declare -a FILE_NAME
 
   # ====Begin======================================================================================
@@ -35,6 +38,9 @@ function nbs::run_all_script_in_directory(){
       bash "${each_file}"
       EXIT_CODE=$?
       FILE_NAME+=( "   exit code $EXIT_CODE ‹ $( basename "${each_file}" )")
+      if [[ ${EXIT_CODE} != 0 ]]; then
+          OVERALL_EXIT_CODE=${EXIT_CODE}
+      fi
     fi
   done
 
@@ -44,6 +50,9 @@ function nbs::run_all_script_in_directory(){
       bash "${each_file}"
       EXIT_CODE=$?
       FILE_NAME+=( "   exit code $EXIT_CODE ‹ $( basename "${each_file}" )")
+      if [[ ${EXIT_CODE} != 0 ]]; then
+          OVERALL_EXIT_CODE=${EXIT_CODE}
+      fi
     fi
   done
 
@@ -54,6 +63,8 @@ function nbs::run_all_script_in_directory(){
 
   # ====Teardown===================================================================================
   cd "${_TMP_CWD}"
+
+  return $OVERALL_EXIT_CODE
 }
 
 # ::::Main:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -64,4 +75,5 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
 else
   # This script is being sourced, ie: __name__="__source__"
   nbs::run_all_script_in_directory
+  exit $?
 fi
