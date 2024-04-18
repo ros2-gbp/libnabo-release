@@ -1,28 +1,31 @@
-[//]: # ( ==== Logo ================================================== )
 <div align="center">
+
+[//]: # ( ==== Logo ================================================== )
 <br>
 <br>
 <a href="https://norlab.ulaval.ca">
-<img src="visual/norlab_logo_acronym_dark.png" width="200">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="/visual/norlab_logo_acronym_light.png">
+      <source media="(prefers-color-scheme: light)" srcset="/visual/norlab_logo_acronym_dark.png">
+      <img alt="Shows an the dark NorLab logo in light mode and light NorLab logo in dark mode." src="/visual/norlab_logo_acronym_dark.png" width="175">
+    </picture>
 </a>
+<br>
 <br>
 
 [//]: # ( ==== Title ================================================= )
 # _Norlab Build System (NBS)_
 
-</div>
-
 [//]: # ( ==== Hyperlink ============================================= )
-<div align="center">
-<p>
 <sup>
-<a href="https://http://132.203.26.125:8111">NorLab TeamCity GUI</a>
-(VPN/intranet access) &nbsp; • &nbsp;  
+<a href="http://132.203.26.125:8111">NorLab TeamCity GUI</a>
+(VPN/intranet access) &nbsp; • &nbsp;
 <a href="https://hub.docker.com/repositories/norlabulaval">norlabulaval</a>
 (Docker Hub) &nbsp;
-
 </sup>
-</p>  
+<br>
+<br>
+
 
 [//]: # ( ==== Description =========================================== )
 **`NBS` is a build-infrastructure-agnostic build system custom-made 
@@ -33,15 +36,20 @@ to meet our need in robotic software engineering at NorLab.**
 
 [//]: # ( ==== Badges ================================================ )
 [![semantic-release: conventional commits](https://img.shields.io/badge/semantic--release-conventional_commits-453032?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
-<img src="https://img.shields.io/static/v1?label=JetBrains TeamCity&message=CI/CD&color=green?style=plastic&logo=teamcity" />
 <img alt="GitHub release (with filter)" src="https://img.shields.io/github/v/release/norlab-ulaval/norlab-build-system">
+<a href="http://132.203.26.125:8111"><img src="https://img.shields.io/static/v1?label=JetBrains TeamCity&message=CI/CD&color=green?style=plastic&logo=teamcity" /></a>
 
 <br>
 
 [//]: # ( ==== Maintainer ============================================ )
-Maintainer: [Luc Coupal](https://redleader962.github.io)
-</div>
+<sub>
+Maintainer <a href="https://redleader962.github.io">Luc Coupal</a>
+</sub>
+
 <br>
+<hr style="color:lightgray;background-color:lightgray">
+</div>
+
 
 [//]: # ( ==== Body ================================================== )
 <details>

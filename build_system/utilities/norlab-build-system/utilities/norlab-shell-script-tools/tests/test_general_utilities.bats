@@ -94,6 +94,9 @@ teardown() {
 
   run n2st::seek_and_modify_string_in_file "${LOOKUP_STR}.*" "${MODIFIED_STR}" "$TMP_TEST_FILE"
   assert_success
+
+  assert_file_exist "${TMP_TEST_FILE}"
+
   run n2st::preview_file_in_promt "$TMP_TEST_FILE"
   assert_output --partial "${UNCHANGED_STR}"
   refute_output --partial "${ORIGINAL_STR}"
