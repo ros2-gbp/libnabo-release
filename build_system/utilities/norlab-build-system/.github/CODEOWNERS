@@ -1,0 +1,24 @@
+# =================================================================================================
+# Files or directories with designated code owner.
+#
+# Note:
+#   - Each line is a file pattern followed by one or more owners.
+#   - Branch with branch protection rule "Require review from Code Owners"
+#     will automaticaly trigger a request to a designated code owner
+# =================================================================================================
+
+# ....Repository wide code owner...................................................................
+# These owners will be the default owners for everything in the repo.
+*       @RedLeader962
+
+# ....Core directories and files...................................................................
+/src/ @RedLeader962
+/tests/ @RedLeader962
+/.env.nbs @RedLeader962
+/import_norlab_build_system_lib.bash @RedLeader962
+/README.md @RedLeader962
+
+# ....DevOps related...............................................................................
+/.github/ @RedLeader962
+/.gitignore @RedLeader962
+/.gitmodules @RedLeader962

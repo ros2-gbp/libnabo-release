@@ -1,0 +1,24 @@
+services:
+
+  # ====Dependency related services================================================================
+  dependencies:
+    image: ${NBS_DOCKERHUB_NAMESPACE:?err}/${NBS_REPOSITORY_NAME:?err}-dependencies:${NBS_IMAGE_TAG:?err}
+    build:
+      target: dependencies
+      context: ..
+      # (Priority) ToDo: change path to dockerfile
+      dockerfile: ${NBS_SUPERPROJECT_BUILD_SYSTEM_DIR:?err}/nbs_container/project-dependencies/Dockerfile.dependencies
+      platforms:
+       - "linux/amd64"
+       - "linux/arm64"
+      args:
+        BASE_IMAGE: ${DEPENDENCIES_BASE_IMAGE:?err}
+        BASE_IMAGE_TAG: ${DEPENDENCIES_BASE_IMAGE_TAG:?err}
+        NBS_SUPERPROJECT_BUILD_SYSTEM_DIR: ${NBS_SUPERPROJECT_BUILD_SYSTEM_DIR:?err}
+        IS_TEAMCITY_RUN: ${IS_TEAMCITY_RUN}
+        NBS_LIB_INSTALL_PATH: ${NBS_LIB_INSTALL_PATH:?err}
+        NBS_REPOSITORY_NAME: ${NBS_REPOSITORY_NAME:?err}
+    tty: true
+    stdin_open: true
+    init: true  # Propagate exit code (See remark in task NMO-266)
+

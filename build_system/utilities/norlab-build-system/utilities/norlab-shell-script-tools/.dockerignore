@@ -1,0 +1,39 @@
+
+# ====Project=============================
+
+README.md
+.gitignore
+visual/*
+
+# ====IDE=================================
+
+### VisualStudioCode template
+.vscode/*
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
+### JetBrains
+.idea/*
+
+# ====OS==================================
+
+### macOS 
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### Linux
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+
