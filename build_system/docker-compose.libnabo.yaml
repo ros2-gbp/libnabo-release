@@ -11,12 +11,12 @@ services:
     build:
       context: ..
       dockerfile: ${NBS_SUPERPROJECT_BUILD_SYSTEM_DIR:?err}/ubuntu/Dockerfile.libnabo.integration_test
-      no_cache: false
+      no_cache: true
       target: integration-test-compile-auto-path-resolution
-      # Mute 'platforms' while using arch virtualization with C++ build to prevent segmentation fault during nabo cmake install
-      platforms:
-        - "linux/amd64"
-        - "linux/arm64/v8"
+      ## Mute 'platforms' while using arch virtualization with C++ build to prevent segmentation fault during nabo cmake install
+#      platforms:
+#        - "linux/amd64"
+#        - "linux/arm64/v8"
       args:
         PROJECT_HUB: ${NBS_DOCKERHUB_NAMESPACE}
         BASE_IMAGE: libnabo-dependencies
@@ -50,7 +50,7 @@ services:
     build:
       context: ..
       dockerfile: ${NBS_SUPERPROJECT_BUILD_SYSTEM_DIR}/ubuntu/Dockerfile.libnabo.ci_PR
-      no_cache: false
+      no_cache: true
       args:
         PROJECT_HUB: ${NBS_DOCKERHUB_NAMESPACE}
         BASE_IMAGE: libnabo-dependencies
@@ -69,23 +69,11 @@ services:
     build:
       platforms:
         - "linux/amd64"
-    depends_on:
-      - ci_PR
-  ci_PR_arm64:
+  ci_PR_arm64v8:
     extends: ci_PR
     build:
       platforms:
-        - "linux/arm64"
-    depends_on:
-      - ci_PR
-  ci_PR_multiarch:
-    extends: ci_PR
-    build:
-      platforms:
-        - "linux/amd64"
-        - "linux/arm64"
-    depends_on:
-      - ci_PR
+        - "linux/arm64/v8"
 
   # ====Dockerhub release image====================================================================
   release:
@@ -97,7 +85,7 @@ services:
       platforms:
         - "linux/amd64"
         - "linux/arm64/v8"
-      no_cache: false
+      no_cache: true
       args:
         PROJECT_HUB: ${NBS_DOCKERHUB_NAMESPACE}
         BASE_IMAGE: libnabo-dependencies-doc

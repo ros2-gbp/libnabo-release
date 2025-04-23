@@ -52,9 +52,6 @@ function nbs::source_lib(){
       source "${each_file}"
   done
 
-  # Set reference that the NBS library was imported with this script
-  export NBS_IMPORTED=true
-
   # ====Teardown===================================================================================
   cd "${TMP_CWD}"
 }

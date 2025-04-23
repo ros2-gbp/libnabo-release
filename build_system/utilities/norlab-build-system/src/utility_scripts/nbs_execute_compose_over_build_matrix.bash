@@ -4,7 +4,7 @@
 #
 # Usage:
 #   $ cd <path/to>/norlab-build-system/src/utility_scripts/
-#   $ [bash|source] nbs_execute_compose_over_build_matrix.bash [--help] <.env.build_matrix.*> [<optional flag>] [-- <any docker cmd+arg>]
+#   $ bash nbs_execute_compose_over_build_matrix.bash [--help] <.env.build_matrix.*> [<optional flag>] [-- <any docker cmd+arg>]
 #
 #  e.g.:
 #   $ bash nbs_execute_compose_over_build_matrix.bash ".env.build_matrix" -- build --dry-run
@@ -44,47 +44,26 @@
 #set -v
 #set -x
 
-MSG_ERROR_FORMAT="\033[1;31m"
-MSG_DIMMED_FORMAT="\033[1;2m"
-MSG_END_FORMAT="\033[0m"
-
-
 # ....Pre-condition................................................................................
 if [[ "$(basename "$(pwd)")" != "utility_scripts" ]]; then
-  echo -e "\n${MSG_ERROR_FORMAT}[ERROR]${MSG_END_FORMAT} 'nbs_execute_compose_over_build_matrix.bash' script must be executed from the 'norlab-build-system/src/utility_scripts/' directory!\n Curent working directory is '$(pwd)'" 1>&2
+  echo -e "\n[\033[1;31mERROR\033[0m] 'nbs_execute_compose_over_build_matrix.bash' script must be executed from the 'norlab-build-system/src/utility_scripts/' directory!\n Curent working directory is '$(pwd)'" 1>&2
+  echo '(press any key to exit)'
+  read -r -n 1
   exit 1
 fi
 
-if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
-  # This script is being run, ie: __name__="__main__"
-
-  # ....Helper function............................................................................
-  # import shell functions from utilities library
-  SCRIPT_PATH="$(realpath "$0")"
-  NBS_PATH="$( realpath "$(dirname "${SCRIPT_PATH}")/../.." )"
-  source "${NBS_PATH}/import_norlab_build_system_lib.bash" || exit 1
-
-else
-  # This script is being sourced, ie: __name__="__source__"
-
-  if [[ "${NBS_IMPORTED}" != "true" ]]; then
-    echo -e "\n${MSG_ERROR_FORMAT}[ERROR]${MSG_END_FORMAT} You need to execute ${MSG_DIMMED_FORMAT}import_norlab_build_system_lib.bash${MSG_END_FORMAT} before sourcing ${MSG_DIMMED_FORMAT}nbs_execute_compose_over_build_matrix.bash${MSG_END_FORMAT} otherwise run it with bash." 1>&2
-    exit 1
-  else
-    # NBS was imported prior to the script execution
-    :
-  fi
-
-fi
+# ....path resolution logic........................................................................
+SCRIPT_PATH="$(realpath "$0")"
+NBS_PATH="$(dirname "${SCRIPT_PATH}")/../.."
 
 
+# ....Helper function..............................................................................
+# import shell functions from utilities library
+source "${NBS_PATH}/import_norlab_build_system_lib.bash"
 
 # ....Default......................................................................................
 DOCKER_COMPOSE_CMD_ARGS='build --dry-run'
 BUILD_STATUS_PASS=0
-COMPOSE_EXIT_CODE=1
-
-
 
 # ....Project root logic...........................................................................
 TMP_CWD=$(pwd)
@@ -237,11 +216,11 @@ print_msg "Build images specified in ${MSG_DIMMED_FORMAT}'${NBS_EXECUTE_BUILD_MA
 
 # Freeze build matrix env variable to prevent accidental override
 # Note: declare -r ==> set as read-only, declare -a  ==> set as an array
-declare -ra NBS_MATRIX_REPOSITORY_VERSIONS=(${NBS_MATRIX_REPOSITORY_VERSIONS[@]})
-declare -ra NBS_MATRIX_CMAKE_BUILD_TYPE=(${NBS_MATRIX_CMAKE_BUILD_TYPE[@]})
-declare -ra NBS_MATRIX_SUPPORTED_OS=(${NBS_MATRIX_SUPPORTED_OS[@]})
-declare -ra NBS_MATRIX_UBUNTU_SUPPORTED_VERSIONS=(${NBS_MATRIX_UBUNTU_SUPPORTED_VERSIONS[@]})
-declare -ra NBS_MATRIX_OSX_SUPPORTED_VERSIONS=(${NBS_MATRIX_OSX_SUPPORTED_VERSIONS[@]})
+declare -ra NBS_MATRIX_REPOSITORY_VERSIONS
+declare -ra NBS_MATRIX_CMAKE_BUILD_TYPE
+declare -ra NBS_MATRIX_SUPPORTED_OS
+declare -ra NBS_MATRIX_UBUNTU_SUPPORTED_VERSIONS
+declare -ra NBS_MATRIX_OSX_SUPPORTED_VERSIONS
 
 print_msg "Environment variables ${MSG_EMPH_FORMAT}(build matrix)${MSG_END_FORMAT} set for compose:\n
 ${MSG_DIMMED_FORMAT}    NBS_MATRIX_REPOSITORY_VERSIONS=(${NBS_MATRIX_REPOSITORY_VERSIONS[*]}) ${MSG_END_FORMAT}
@@ -299,17 +278,15 @@ for EACH_REPO_VERSION in "${NBS_MATRIX_REPOSITORY_VERSIONS[@]}"; do
                               --os-version "${EACH_OS_VERSION}" \
                               -- "${DOCKER_COMPOSE_CMD_ARGS}"
 
-        COMPOSE_EXIT_CODE=$?
-
         # ....Collect image tags exported by nbs::execute_compose............................
-        # Global: Read 'COMPOSE_EXIT_CODE' env variable exported by function show_and_execute_docker
-        if [[ ${COMPOSE_EXIT_CODE} == 0 ]]; then
+        # Global: Read 'DOCKER_EXIT_CODE' env variable exported by function show_and_execute_docker
+        if [[ ${DOCKER_EXIT_CODE} == 0 ]]; then
           MSG_STATUS="${MSG_DONE_FORMAT}Pass ${MSG_DIMMED_FORMAT}›"
           MSG_STATUS_TC_TAG="Pass ›"
         else
           MSG_STATUS="${MSG_ERROR_FORMAT}Fail ${MSG_DIMMED_FORMAT}›"
           MSG_STATUS_TC_TAG="Fail ›"
-          BUILD_STATUS_PASS=$COMPOSE_EXIT_CODE
+          BUILD_STATUS_PASS=$DOCKER_EXIT_CODE
 
           if [[ ${TEAMCITY_VERSION} ]]; then
             # Fail the build › Will appear on the TeamCity Build Results page
@@ -320,7 +297,7 @@ for EACH_REPO_VERSION in "${NBS_MATRIX_REPOSITORY_VERSIONS[@]}"; do
         # Collect image tags exported by nbs::execute_compose
         # Global: Read 'NBS_IMAGE_TAG' env variable exported by nbs::execute_compose
         if [[ ${EACH_CMAKE_BUILD_TYPE} == 'None' ]] || [[ -z ${EACH_CMAKE_BUILD_TYPE} ]]; then
-          IMAGE_TAG_CRAWLED=("${IMAGE_TAG_CRAWLED[@]}" "${MSG_STATUS} ${NBS_IMAGE_TAG:?"Env variable not set"}")
+          IMAGE_TAG_CRAWLED=("${IMAGE_TAG_CRAWLED[@]}" "${MSG_STATUS} ${NBS_IMAGE_TAG}")
           IMAGE_TAG_CRAWLED_TC=("${IMAGE_TAG_CRAWLED_TC[@]}" "${MSG_STATUS_TC_TAG} ${NBS_IMAGE_TAG}")
         else
           IMAGE_TAG_CRAWLED=("${IMAGE_TAG_CRAWLED[@]}" "${MSG_STATUS} ${NBS_IMAGE_TAG} Compile mode: ${EACH_CMAKE_BUILD_TYPE}")

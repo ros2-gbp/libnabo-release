@@ -48,11 +48,8 @@ function n2st::seek_and_modify_string_in_file() {
   local TMP_CHANGE_FOR="${2}"
   local TMP_FILE_PATH="${3}"
 
-  # Note:
-  #   - Character ';' is used as a delimiter
-  #   - Keep -i flag for portability to Mac OsX (it's analogue to --in-place flag)
-  #   - .bak is the backup extension convention and is required by -i
-  sudo sed -i.bak "s;${TMP_SEEK};${TMP_CHANGE_FOR};" "${TMP_FILE_PATH}" && rm "${TMP_FILE_PATH}.bak"
+  # Note: Character ';' is used as a delimiter
+  sudo sed --in-place "s;${TMP_SEEK};${TMP_CHANGE_FOR};" "${TMP_FILE_PATH}"
 
 }
 

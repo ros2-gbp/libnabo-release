@@ -88,32 +88,6 @@ PATH_TO_DOCKERFILE="${SRC_CODE_PATH}"/build_system_templates/docker-compose.depe
   assert_output --regexp "Status of tag crawled:".*"Pass".*"› latest-ubuntu-bionic".*"Pass".*"› latest-ubuntu-focal".*"Completed".*"nbs_execute_compose_over_build_matrix.bash".*
 }
 
-
-@test "docker exit code propagation on pass › expect pass" {
-  local DOCKER_CMD="version"
-  mock_docker_command_exit_ok
-  set +e
-  nbs::execute_compose "${PATH_TO_DOCKERFILE}" \
-                      --ci-test-force-runing-docker-cmd -- "$DOCKER_CMD"
-  DOCKER_EXIT_CODE=$?
-
-  set -e
-  assert_equal "$DOCKER_EXIT_CODE" 0
-}
-
-@test "docker exit code propagation on faillure › expect pass" {
-  local DOCKER_CMD="version"
-  mock_docker_command_exit_error
-  set +e
-  nbs::execute_compose "${PATH_TO_DOCKERFILE}" \
-                      --ci-test-force-runing-docker-cmd -- "$DOCKER_CMD"
-  DOCKER_EXIT_CODE=$?
-
-  set -e
-  assert_equal "$DOCKER_EXIT_CODE" 1
-}
-
-
 # ....Test --help flag related logic...............................................................
 @test "${TESTED_FILE} › function ${TESTED_FCT} › --help as first argument  › execute ok › expect pass" {
 

@@ -16,6 +16,7 @@ ENV NBS_REPOSITORY_NAME=${NBS_REPOSITORY_NAME:?'Build argument needs to be set a
 
 ARG CMAKE_BUILD_TYPE=RelWithDebInfo
 ARG INSTALL_SCRIPT_FLAG='--build-system-CI-install --compile-test'
+# Note: Those env variable are used in the entrypoint build version
 ENV CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 ENV INSTALL_SCRIPT_FLAG=${INSTALL_SCRIPT_FLAG}
 
@@ -25,6 +26,7 @@ ENV IS_TEAMCITY_RUN=${IS_TEAMCITY_RUN:-false}
 SHELL ["/bin/bash", "-c"]
 ARG DEBIAN_FRONTEND=noninteractive
 
+# ToDo: validate
 ENV TERM=${TERM:-"xterm-256color"}
 
 # ====Checkout repository==========================================================================
@@ -35,18 +37,9 @@ COPY . .
 
 # ====Check dependencies installed versions========================================================
 WORKDIR "${NBS_LIB_INSTALL_PATH}/${NBS_REPOSITORY_NAME}/${NBS_SUPERPROJECT_BUILD_SYSTEM_DIR}"
+
 RUN chmod +x ./nbs_container/project-core/entrypoint.bash
-RUN chmod +x ./installer/nbs_cmake_install_ubuntu.bash
 
-## (Priority) ToDo: add install logic here
-#WORKDIR "./installer"
-#RUN bash nbs_cmake_install_ubuntu.bash \
-#    --install-path ${NBS_LIB_INSTALL_PATH} \
-#    --repository-version ${REPOSITORY_VERSION} \
-#    --cmake-build-type ${CMAKE_BUILD_TYPE} \
-#    ${INSTALL_SCRIPT_FLAG}
-
-# (Priority) ToDo: add test logic here
 
 # ====End==========================================================================================
 ENTRYPOINT [ "./nbs_container/project-core/entrypoint.bash" ]

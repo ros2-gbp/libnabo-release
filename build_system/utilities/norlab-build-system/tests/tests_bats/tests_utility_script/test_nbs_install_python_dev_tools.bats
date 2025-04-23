@@ -64,7 +64,7 @@ teardown() {
 
 # ====Test casses==================================================================================
 
-@test "Executing $TESTED_FILE from bad cwd › expect fail" {
+@test "sourcing $TESTED_FILE from bad cwd › expect fail" {
   cd "${BATS_DOCKER_WORKDIR}/src/"
   # Note:
   #  - "echo 'Y'" is for sending an keyboard input to the 'read' command which expect a single character
@@ -75,7 +75,7 @@ teardown() {
   assert_output --regexp  .*"\[".*"ERROR".*"\]".*"'nbs_install_python_dev_tools.bash' script must be executed from the"
 }
 
-@test "executing $TESTED_FILE from ok cwd › expect pass" {
+@test "sourcing $TESTED_FILE from ok cwd › expect pass" {
   cd "${BATS_DOCKER_WORKDIR}/${TESTED_FILE_PATH}"
   run bash -c "bash ./$TESTED_FILE"
   assert_success

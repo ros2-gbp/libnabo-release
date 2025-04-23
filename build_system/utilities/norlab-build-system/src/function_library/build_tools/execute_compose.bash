@@ -5,8 +5,7 @@
 # Usage example:
 #   $ cd <path/to/norlab-build-system/root>
 #   $ source import_norlab_build_system_lib.bash
-#   $ nbs::execute_compose docker-compose.project.yaml -- run --rm ci
-#   $ DOCKER_EXIT_CODE=$?
+#   $ nbs::execute_compose -- run --rm ci
 #
 # Signature:
 #   $ nbs::execute_compose [--help] <docker-compose.yaml> [<optional flag>] [-- <any docker cmd+arg>]
@@ -35,12 +34,6 @@
 #   Dont use "set -e" in this script as it will affect the build system policy, use the --fail-fast flag instead
 #
 
-# Variable set for export
-declare -x REPOSITORY_VERSION
-declare -x CMAKE_BUILD_TYPE
-declare -x DEPENDENCIES_BASE_IMAGE
-declare -x DEPENDENCIES_BASE_IMAGE_TAG
-declare -x NBS_IMAGE_TAG
 
 function nbs::execute_compose() {
   # ....Default....................................................................................
@@ -49,9 +42,6 @@ function nbs::execute_compose() {
   OS_NAME='ubuntu'
   OS_VERSION='focal'
   DOCKER_COMPOSE_CMD_ARGS='build --dry-run'  # alt: "build --no-cache --push" or "up --build --force-recreate"
-  local _CI_TEST=false
-  local DOCKER_EXIT_CODE=1
-  local MAIN_DOCKER_EXIT_CODE=1
 
   # ....Project root logic.........................................................................
   local TMP_CWD=$(pwd)
@@ -74,7 +64,6 @@ function nbs::execute_compose() {
                                         (default to 'jammy')
         --docker-debug-logs             Set Docker builder log output for debug (i.e.BUILDKIT_PROGRESS=plain)
         --fail-fast                     Exit script at first encountered error
-        --ci-test-force-runing-docker-cmd
     \033[1m
       [-- <any docker cmd+arg>]\033[0m         Any argument passed after '--' will be passed to docker compose as docker
                                         command and arguments (default to '${DOCKER_COMPOSE_CMD_ARGS}').
@@ -162,10 +151,6 @@ function nbs::execute_compose() {
       set -e
       shift # Remove argument (--fail-fast)
       ;;
-    --ci-test-force-runing-docker-cmd)
-      _CI_TEST=true
-      shift # Remove argument (--ci-test-force-running-docker-cmd)
-      ;;
     -h | --help)
       nbs::print_help_in_terminal
       exit
@@ -210,8 +195,7 @@ function nbs::execute_compose() {
   ## docker compose build [OPTIONS] [SERVICE...]
   ## docker compose run [OPTIONS] SERVICE [COMMAND] [ARGS...]
 
-  show_and_execute_docker "compose -f ${_COMPOSE_FILE} ${DOCKER_COMPOSE_CMD_ARGS}" "$_CI_TEST"
-  MAIN_DOCKER_EXIT_CODE="${DOCKER_EXIT_CODE:?"variable was not set by n2st::show_and_execute_docker"}"
+  show_and_execute_docker "compose -f ${_COMPOSE_FILE} ${DOCKER_COMPOSE_CMD_ARGS}"
 
 
   print_msg "Environment variables used by compose:\n
@@ -223,6 +207,4 @@ function nbs::execute_compose() {
   print_formated_script_footer 'nbs::execute_compose' "${MSG_LINE_CHAR_BUILDER_LVL2}"
   # ====Teardown===================================================================================
   cd "${TMP_CWD}"
-
-  return "${MAIN_DOCKER_EXIT_CODE:?"variable was not set by n2st::show_and_execute_docker"}"
 }

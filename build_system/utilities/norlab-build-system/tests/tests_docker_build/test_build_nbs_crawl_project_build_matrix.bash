@@ -2,9 +2,8 @@
 
 # ....path resolution logic........................................................................
 _PATH_TO_SCRIPT="$(realpath "${BASH_SOURCE[0]}")"
-LPM_ROOT_DIR="$( realpath "$(dirname "${_PATH_TO_SCRIPT}")/../../" )"
-cd "${LPM_ROOT_DIR}"
-
+LPM_ROOT_DIR="$(dirname "${_PATH_TO_SCRIPT}")"
+cd "${LPM_ROOT_DIR}/../../"
 
 # ====begin========================================================================================
 set -o allexport
@@ -13,7 +12,7 @@ set +o allexport
 
 cd src/utility_scripts
 
-DOTENV_BUILD_MATRIX=${LPM_ROOT_DIR}/build_system_templates/.env.build_matrix.project.template
+DOTENV_BUILD_MATRIX=${LPM_ROOT_DIR}/../../build_system_templates/.env.build_matrix.project.template
 
 #export BUILDKIT_PROGRESS=plain # ToDo: on dev task end >> mute this line ←
 
