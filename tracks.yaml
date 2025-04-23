@@ -161,8 +161,7 @@ tracks:
     ros_distro: kilted
     vcs_type: git
     vcs_uri: https://github.com/norlab-ulaval/libnabo.git
-    version: 1.1.1
-    version_saved: :{auto}
+    version: :{auto}
   melodic:
     actions:
     - bloom-export-upstream :{vcs_local_uri} :{vcs_type} --tag :{release_tag} --display-uri
